@@ -11,8 +11,8 @@ import (
 	"strings"
 	"text/template"
 
-	resource "github.com/cioplenu/concourse-nomad-resource"
-	"github.com/cioplenu/concourse-nomad-resource/common"
+	resource "github.com/natto1784/concourse-nomad-resource"
+	"github.com/natto1784/concourse-nomad-resource/common"
 )
 
 type Params struct {
