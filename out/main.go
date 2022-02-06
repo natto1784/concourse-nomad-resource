@@ -45,6 +45,7 @@ func main() {
 	templPath := filepath.Join(sourceDir, config.Params.JobPath)
 	templFile, err := ioutil.ReadFile(templPath)
 	common.Check(err, "Could not read input file "+templPath)
+  if ( config.Source.Templating != false ) {
 	tmpl, err := template.New("job").Parse(string(templFile))
 	common.Check(err, "Error parsing template")
 
@@ -65,6 +66,7 @@ func main() {
 	defer outFile.Close()
 	_, err = outFile.Write(buf.Bytes())
 	common.Check(err, "Error writing output file")
+	}
 
 	cmd := exec.Command(
 		"nomad",
