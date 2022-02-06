@@ -72,6 +72,8 @@ func main() {
 		"run",
 		"-address="+config.Source.URL,
 		"-token="+config.Source.Token,
+		"-consul-token="+config.Source.ConsulToken,
+		"-vault-token="+config.Source.VaultToken,
 		templPath,
 	)
 	var out bytes.Buffer

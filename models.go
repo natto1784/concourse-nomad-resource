@@ -1,9 +1,11 @@
 package resource
 
 type Source struct {
-	URL   string `json:"url"`
-	Name  string `json:"name"`
-	Token string `json:"token"`
+	URL         string `json:"url"`
+	Name        string `json:"name"`
+	Token       string `json:"token"`
+	ConsulToken string `json:"consul_token"`
+	VaultToken  string `json:"vault_token"`
 }
 
 type JobVersion struct {
