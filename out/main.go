@@ -68,6 +68,26 @@ func main() {
 	common.Check(err, "Error writing output file")
 	}
 
+  if ( config.Source.Restart != false ) {
+    cmd := exec.Command(
+      "nomad",
+      "job",
+      "stop",
+      "-purge",
+      "-address="+config.Source.URL,
+      "-token="+config.Source.Token,
+      config.Source.Name,
+    )
+	  var out bytes.Buffer
+	  cmd.Stdout = &out
+	  cmd.Stderr = &out
+	  err = cmd.Run()
+	  if err != nil {
+		  fmt.Fprintf(os.Stderr, "Error executing nomad: %s\n", err)
+		  fmt.Fprint(os.Stderr, out.String())
+		  os.Exit(1)
+	  }
+  }
 	cmd := exec.Command(
 		"nomad",
 		"job",
