@@ -6,8 +6,6 @@ type Source struct {
 	Token       string `json:"token"`
 	ConsulToken string `json:"consul_token"`
 	VaultToken  string `json:"vault_token"`
-	Templating  bool   `json:"templating"`
-	Restart     bool   `json:"restart"`
 }
 
 type JobVersion struct {

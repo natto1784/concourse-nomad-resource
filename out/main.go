@@ -16,9 +16,11 @@ import (
 )
 
 type Params struct {
-	JobPath  string            `json:"job_path"`
-	Vars     map[string]string `json:"vars"`
-	VarFiles map[string]string `json:"var_files"`
+	JobPath    string            `json:"job_path"`
+	Vars       map[string]string `json:"vars"`
+	VarFiles   map[string]string `json:"var_files"`
+	Templating bool              `json:"templating"`
+	Restart    bool              `json:"restart"`
 }
 
 type OutConfig struct {
@@ -45,49 +47,45 @@ func main() {
 	templPath := filepath.Join(sourceDir, config.Params.JobPath)
 	templFile, err := ioutil.ReadFile(templPath)
 	common.Check(err, "Could not read input file "+templPath)
-  if ( config.Source.Templating != false ) {
-	tmpl, err := template.New("job").Parse(string(templFile))
-	common.Check(err, "Error parsing template")
+	if config.Params.Templating != false {
+		tmpl, err := template.New("job").Parse(string(templFile))
+		common.Check(err, "Error parsing template")
 
-	for name, path := range config.Params.VarFiles {
-		varPath := filepath.Join(sourceDir, path)
-		varFile, err := ioutil.ReadFile(varPath)
-		common.Check(err, "Error reading var file")
-		config.Params.Vars[name] = strings.TrimSpace(string(varFile))
+		for name, path := range config.Params.VarFiles {
+			varPath := filepath.Join(sourceDir, path)
+			varFile, err := ioutil.ReadFile(varPath)
+			common.Check(err, "Error reading var file")
+			config.Params.Vars[name] = strings.TrimSpace(string(varFile))
+		}
+
+		buf := new(bytes.Buffer)
+
+		err = tmpl.Execute(buf, config.Params.Vars)
+		common.Check(err, "Error executing template")
+
+		outFile, err := os.Create(templPath)
+		common.Check(err, "Error creating output file")
+		defer outFile.Close()
+		_, err = outFile.Write(buf.Bytes())
+		common.Check(err, "Error writing output file")
 	}
 
-	buf := new(bytes.Buffer)
-
-	err = tmpl.Execute(buf, config.Params.Vars)
-	common.Check(err, "Error executing template")
-
-	outFile, err := os.Create(templPath)
-	common.Check(err, "Error creating output file")
-	defer outFile.Close()
-	_, err = outFile.Write(buf.Bytes())
-	common.Check(err, "Error writing output file")
+	if config.Params.Restart != false {
+		cmd := exec.Command(
+			"nomad",
+			"job",
+			"stop",
+			"-purge",
+			"-address="+config.Source.URL,
+			"-token="+config.Source.Token,
+			config.Source.Name,
+		)
+		var out bytes.Buffer
+		cmd.Stdout = &out
+		cmd.Stderr = &out
+		_ = cmd.Run()
+		//Ignore even if the job fails to purge
 	}
-
-  if ( config.Source.Restart != false ) {
-    cmd := exec.Command(
-      "nomad",
-      "job",
-      "stop",
-      "-purge",
-      "-address="+config.Source.URL,
-      "-token="+config.Source.Token,
-      config.Source.Name,
-    )
-	  var out bytes.Buffer
-	  cmd.Stdout = &out
-	  cmd.Stderr = &out
-	  err = cmd.Run()
-	  if err != nil {
-		  fmt.Fprintf(os.Stderr, "Error executing nomad: %s\n", err)
-		  fmt.Fprint(os.Stderr, out.String())
-		  os.Exit(1)
-	  }
-  }
 	cmd := exec.Command(
 		"nomad",
 		"job",
