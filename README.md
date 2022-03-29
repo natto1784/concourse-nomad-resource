@@ -8,7 +8,7 @@ resource_types:
   - name: nomad
     type: registry-image
     source:
-      repository: cioplenu/concourse-nomad-resource
+      repository: natto1784/concourse-nomad-resource
       tag: latest
 
 resources:
@@ -48,6 +48,9 @@ like a version on the fly.
   values. Each key should be represented in the job file as `{{.key}}` and the values should be path
   to text files which content will be used as the variable value. Whitespace and trailing newlines
   will be trimmed from the value.
+* `templating`: { bool }: Whether to use templating or not. `true` by default
+* `restart`: { bool }: Whether to restart a job or not. `false` by default
+> **NOTE:**  Restart just runs `stop -purge` against the job before running `run` against it
 
 ## Example
 
@@ -56,7 +59,7 @@ resource_types:
   - name: nomad
     type: registry-image
     source:
-      repository: cioplenu/concourse-nomad-resource
+      repository: natto1784/concourse-nomad-resource
       tag: latest
 
 resources:
