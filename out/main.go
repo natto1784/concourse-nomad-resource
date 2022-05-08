@@ -51,6 +51,14 @@ func main() {
 		tmpl, err := template.New("job").Delims("{{+", "+}}").Parse(string(templFile))
 		common.Check(err, "Error parsing template")
 
+		if config.Params.Vars == nil {
+			config.Params.Vars = map[string]string{}
+		}
+
+		if config.Params.VarFiles == nil {
+			config.Params.VarFiles = map[string]string{}
+		}
+
 		for name, path := range config.Params.VarFiles {
 			varPath := filepath.Join(sourceDir, path)
 			varFile, err := ioutil.ReadFile(varPath)
@@ -86,6 +94,7 @@ func main() {
 		_ = cmd.Run()
 		//Ignore even if the job fails to purge
 	}
+
 	cmd := exec.Command(
 		"nomad",
 		"job",
