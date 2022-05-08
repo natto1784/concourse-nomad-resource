@@ -48,7 +48,7 @@ func main() {
 	templFile, err := ioutil.ReadFile(templPath)
 	common.Check(err, "Could not read input file "+templPath)
 	if config.Params.Templating != false {
-		tmpl, err := template.New("job").Parse(string(templFile))
+		tmpl, err := template.New("job").Delims("{{+", "+}}").Parse(string(templFile))
 		common.Check(err, "Error parsing template")
 
 		for name, path := range config.Params.VarFiles {

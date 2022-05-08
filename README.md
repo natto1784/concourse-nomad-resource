@@ -43,9 +43,9 @@ like a version on the fly.
 #### Parameters
 * `job_path`: (required) Path of the HCL job file to run
 * `vars`: { [key: string]: string } dictionary of variables to substitute in the job file. Each key
-  should be represented in the job file as `{{.key}}`
+  should be represented in the job file as `{{+.key+}}`
 * `var_files`: { [key: string]: string } dictionary of paths to files to read to get variable
-  values. Each key should be represented in the job file as `{{.key}}` and the values should be path
+  values. Each key should be represented in the job file as `{{+.key+}}` and the values should be path
   to text files which content will be used as the variable value. Whitespace and trailing newlines
   will be trimmed from the value.
 * `templating`: { bool }: Whether to use templating or not. `true` by default
@@ -103,10 +103,10 @@ job "sample" {
       driver = "docker"
 
       config {
-        image = "cioplenu/sample:{{.version}}"
+        image = "cioplenu/sample:{{+.version+}}"
         auth  = {
           username = "some-username"
-          password = "{{.registry_token}}"
+          password = "{{+.registry_token+}}"
         }
         force_pull = true
       }
